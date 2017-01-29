@@ -8,8 +8,10 @@ import StatsPlugin from 'stats-webpack-plugin';
 import {output, loader, plugin} from 'webpack-partial';
 import hot from 'webpack-config-hot';
 import devServer from 'webpack-config-dev-server';
+import buildInfo from './build-info.webpack.config';
 import style from './style.webpack.config';
 import locale from './locale.webpack.config';
+import phaser from './phaser.webpack.config';
 
 const context = path.dirname(nearest('package.json'));
 const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
@@ -21,8 +23,8 @@ export default () => (config) => compose(
   plugin(new StatsPlugin('stats.json')),
 
   /*
- * Inject additional modules depending on the environment target.
- */
+  * Inject additional modules depending on the environment target.
+  */
   // TODO: dev-server requires HMR. the dev-server should actually be checking
   // this constraint in the webpack config and warning otherwise.
   isDev ? hot() : identity,
@@ -36,6 +38,12 @@ export default () => (config) => compose(
   // Partials
   // ========================================================================
   locale(),
+
+  // Inject `BUILD_TARGET` and `BUILD_ENTRY_NAME`
+  buildInfo(),
+
+  phaser(),
+
   style((process.env.NODE_ENV === 'production' ? {
     localIdentName: '[hash:base64]',
     // Append a content hash to prevent browser chaching between releases.

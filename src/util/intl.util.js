@@ -37,7 +37,7 @@ export const loadReactIntlLocaleDataForLanguage = memoize(
         // If we are in a web targeted build, use the bundle loader. This will
         // create a new chunk that allows async loading of each module that
         // matches in the context.
-          ? 'bundle'
+          ? 'bundle-loader'
         // Defer loading each new chunk until it is referenced.
           + '?lazy'
         // Extract the languange identifier from the matched module name.
@@ -115,7 +115,7 @@ export const loadPolyfillLocaleData = memoize(
         // If we are in a web targeted build, use the bundle loader. This will
         // create a new chunk that allows async loading of each module that
         // matches in the context.
-          ? 'bundle'
+          ? 'bundle-loader'
         // Defer loading each new chunk until it is referenced.
           + '?lazy'
         // Extract the locale identifier from the matched module name.
@@ -179,7 +179,7 @@ export const loadMessages = memoize(
         // If we are in a web targeted build, use the bundle loader. This will
         // create a new chunk that allows async loading of each module that
         // matches in the context.
-          ? 'bundle'
+          ? 'bundle-loader'
         // Defer loading each new chunk until it is referenced.
           + '?lazy'
         // Extract the locale identifier from the matched module name.
