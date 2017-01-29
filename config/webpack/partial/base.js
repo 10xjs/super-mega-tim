@@ -70,6 +70,10 @@ export default () => (config) => compose(
     test: /\.json$/,
     loader: require.resolve('json-loader'),
   }),
+  loader({
+    test: /\.(png|jpg)$/,
+    loader: require.resolve('file-loader'),
+  }),
 
   // ========================================================================
   // Output Settings
