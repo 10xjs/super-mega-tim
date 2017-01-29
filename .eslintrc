@@ -1,0 +1,15 @@
+extends:
+  - metalab
+  - metalab/react
+rules:
+  func-style: 0
+  quotes: 0
+  jsx-quotes: 0
+globals:
+  # Environment variables are injected as `process.env.ENV_VAR` by webpack.
+  process: true
+  # In the client bundle, `global` is aliased to `window`.
+  global: true
+settings:
+  import/resolve: {}
+  import/resolver: babel-module

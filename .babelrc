@@ -1,0 +1,15 @@
+{
+  "presets": [
+    "metalab"
+  ],
+  "plugins": [
+    "babel-plugin-transform-runtime",
+    ["babel-plugin-module-resolver", {
+      "alias": {
+        // This will cause require paths starting with `/` to resolve to the
+        // `src` directory. i.e. `/app.js` resolves to `src/app.js`.
+        "": "./src"
+      }
+    }]
+  ]
+}
