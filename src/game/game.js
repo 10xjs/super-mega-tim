@@ -24,8 +24,8 @@ export default class Game {
   configurePhysics() {
     this.game.physics.startSystem(Phaser.Physics.P2JS);
     this.game.physics.p2.setImpactEvents(true);
-    // this.game.physics.p2.restitution = 0.4;
-    // this.game.physics.p2.gravity.y = 0;
+    this.game.physics.p2.restitution = 0.4;
+    this.game.physics.p2.gravity.y = 2000;
   }
 
   createMaterials() {

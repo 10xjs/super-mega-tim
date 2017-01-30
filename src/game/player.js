@@ -72,7 +72,7 @@ export default class Player extends Sprite {
 
     if (this.state.cursors.up.isDown && onGround && !this._jump) {
       this._jump = true;
-      this.body.velocity.y = -1000;
+      this.body.velocity.y = -1200;
     }
 
     if (!this.state.cursors.up.isDown) {

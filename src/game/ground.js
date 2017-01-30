@@ -23,6 +23,6 @@ export default class Ground extends Sprite {
   }
 
   update() {
-    // this.body.rotation += 0.01;
+    this.body.rotation += 0.005;
   }
 }
