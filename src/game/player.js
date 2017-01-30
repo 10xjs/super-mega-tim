@@ -1,47 +1,82 @@
+/* global p2 */
+/* eslint-disable max-len */
 import {Sprite} from 'phaser';
 
+const WIDTH = 100;
+const HEIGHT = 150;
+const SENSOR_DEPTH = 25;
+
 export default class Player extends Sprite {
-  constructor(group, sprite, x, y, width = 100, height = 150) {
-    super(group.game, x, y);
+  constructor(state, sprite, x, y) {
+    super(state.game, x, y);
+    this.state = state;
 
     // Assign to group. This adds a physics body.
-    group.add(this);
+    state.groups.player.add(this);
 
     this.body.clearShapes();
     this.body.fixedRotation = true;
 
-    // Create a stack of circles in the shape of a pill, filling the width and
-    // height of the player. The distance between each center is <= r.
-    // The origin is at the bottom center.
-    const radius = width / 2;
-    const count = Math.ceil(height / radius) - 1;
-    const span = (height - width) / (count - 1);
-    for (let i = 0; i < count; i++) {
-      this.body.addCircle(radius, 0, -radius - span * i);
-    }
+    const radius = WIDTH / 2;
+    const length = HEIGHT - WIDTH;
+    const angle = Math.PI / 2;
 
-    // this.body.setCollisionGroup(playerCollisionGroup);
-    // this.body.collides(groundCollisionGroup);
+    this.bodyShape = this.body.addCapsule(length, radius, 0, 0, angle);
+
+    this.body.setMaterial(state.materials.player, this.bodyShape);
+
+    this.body.setCollisionGroup(state.collisionGroups.player);
+    this.body.collides(state.collisionGroups.ground, this.collideGround, this);
 
     this.body.debug = true;
   }
 
-  setCursors(cursors) {
-    this.cursors = cursors;
+  collideGround() {
+    // console.log('collideGround');
+  }
+
+  onGround() {
+    const contacts = this.game.physics.p2.world.narrowphase.contactEquations;
+
+    for (let i = 0, len = contacts.length; i < len; i++) {
+      const contact = contacts[i];
+
+      if (contact.bodyA === this.body.data || contact.bodyB === this.body.data) {
+        let direction = p2.vec2.dot(contact.normalA, p2.vec2.fromValues(0, 1));
+
+        if (contact.bodyA === this.body.data) {
+          direction *= -1;
+        }
+
+        if (direction > 0.5) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   update() {
-    this.body.velocity.x = 0;
+    const onGround = this.onGround();
 
-    if (this.cursors.left.isDown) {
+    if (onGround) {
+      this.body.velocity.x /= 10;
+    }
+
+    if (this.state.cursors.left.isDown) {
       this.body.velocity.x = -500;
-    } else if (this.cursors.right.isDown) {
+    } else if (this.state.cursors.right.isDown) {
       this.body.velocity.x = 500;
     }
 
-    if (this.cursors.up.isDown /* && is on ground */) {
-      this.body.velocity.y = -800;
+    if (this.state.cursors.up.isDown && onGround && !this._jump) {
+      this._jump = true;
+      this.body.velocity.y = -1000;
+    }
+
+    if (!this.state.cursors.up.isDown) {
+      this._jump = false;
     }
   }
 }
-

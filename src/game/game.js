@@ -11,41 +11,98 @@ export default class Game {
       update: ::this.update,
       render: ::this.render,
     });
+
+    this.groups = {};
+    this.collisionGroups = {};
+    this.materials = {};
   }
 
   preload() {
     this.game.time.advancedTiming = true;
   }
 
-  create() {
-    const cursors = this.game.input.keyboard.createCursorKeys();
-
+  configurePhysics() {
     this.game.physics.startSystem(Phaser.Physics.P2JS);
     this.game.physics.p2.setImpactEvents(true);
-    this.game.physics.p2.restitution = 0.4;
-    this.game.physics.p2.gravity.y = 900;
+    // this.game.physics.p2.restitution = 0.4;
+    // this.game.physics.p2.gravity.y = 0;
+  }
 
-    const groundCollisionGroup = this.game.physics.p2.createCollisionGroup();
-    const playerCollisionGroup = this.game.physics.p2.createCollisionGroup();
+  createMaterials() {
+    this.game.physics.p2.world.defaultContactMaterial.friction = 0.3;
 
+    this.materials.world = new Phaser.Physics.P2.Material('worldMaterial');
+    this.materials.player = new Phaser.Physics.P2.Material('playerMaterial');
+    this.materials.ground = new Phaser.Physics.P2.Material('groundMaterial');
+
+    this.materials.playerWorld = this.game.physics.p2.createContactMaterial(
+      this.materials.player,
+      this.materials.world,
+      {
+        friction: 0,
+        restitution: 0.0,
+        stiffness: 1e7,
+        relaxation: 3,
+        frictionStiffness: 1e7,
+        frictionRelaxation: 3,
+        surfaceVelocity: 0,
+      },
+    );
+
+    this.materials.playerGround = this.game.physics.p2.createContactMaterial(
+      this.materials.player,
+      this.materials.ground,
+      {
+        friction: 0,
+        restitution: 0.0,
+        stiffness: 1e7,
+        relaxation: 3,
+        frictionStiffness: 1e7,
+        frictionRelaxation: 3,
+        surfaceVelocity: 0,
+      },
+    );
+  }
+
+  createCollisionGroups() {
+    this.collisionGroups.ground = this.game.physics.p2.createCollisionGroup();
+    this.collisionGroups.player = this.game.physics.p2.createCollisionGroup();
     this.game.physics.p2.updateBoundsCollisionGroup();
+  }
 
-    const groundGroup = this.game.add.group();
-    const playerGroup = this.game.add.group();
+  createGroups() {
+    // Ground group.
+    this.groups.ground = this.game.add.group();
+    this.groups.ground.enableBody = true;
+    this.groups.ground.physicsBodyType = Phaser.Physics.P2JS;
 
-    groundGroup.enableBody = true;
-    groundGroup.physicsBodyType = Phaser.Physics.P2JS;
-    playerGroup.enableBody = true;
-    playerGroup.physicsBodyType = Phaser.Physics.P2JS;
+    // Player group.
+    this.groups.player = this.game.add.group();
+    this.groups.player.enableBody = true;
+    this.groups.player.physicsBodyType = Phaser.Physics.P2JS;
+  }
 
-    const ground = new Ground(groundGroup, null, 300, 300, 400, 50);
-    ground.body.setCollisionGroup(groundCollisionGroup);
-    ground.body.collides(playerCollisionGroup);
+  configureWorld() {
+    this.game.physics.p2.setWorldMaterial(
+      this.materials.world,
+      true, true, true, true,
+    );
+  }
 
-    const player = new Player(playerGroup, null, 50, 200);
-    player.body.setCollisionGroup(playerCollisionGroup);
-    player.body.collides(groundCollisionGroup);
-    player.setCursors(cursors);
+  createEntities() {
+    const ground = new Ground(this, null, 300, 300, 400, 50);
+    this.player = new Player(this, null, 50, 200);
+  }
+
+  create() {
+    this.cursors = this.game.input.keyboard.createCursorKeys();
+
+    this.configurePhysics();
+    this.createMaterials();
+    this.createCollisionGroups();
+    this.createGroups();
+    this.configureWorld();
+    this.createEntities();
   }
 
   update() {
